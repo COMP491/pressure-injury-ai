@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue May 14 18:27:10 2024
+
+@author: ahmetbakcaci
+"""
+
+from flask import Flask, request, jsonify, send_file
+import io
+import your_ai_module  # Import your AI model
+
+app = Flask(__name__)
+
+@app.route('/classify', methods=['POST'])
+def classify():
+    # Receive image data from the frontend
+    image_data = request.files['image']
+
+    # Preprocess image_data if necessary
+
+    # Perform prediction using your AI model
+    prediction, generated_image = your_ai_module.predict_with_image(image_data)
+
+    # Convert generated image data to bytes
+    image_bytes = io.BytesIO()
+    generated_image.save(image_bytes, format='JPEG')
+    image_bytes.seek(0)
+
+    # Return the prediction and generated image as JSON response
+    return jsonify({'prediction': prediction}), send_file(image_bytes, mimetype='image/jpeg')
