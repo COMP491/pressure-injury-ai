@@ -16,7 +16,10 @@ from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 class ModelUtils:
     def __init__(self, model_weights_path, device):
         self.device = device
+        self.classes = ['stage 1', 'stage 2', 'stage 3', 'stage 4']
         self.model = models.resnet18(weights='ResNet18_Weights.IMAGENET1K_V1')
+        fclayer_input_size = self.model.fc.in_features
+        self.model.fc = nn.Linear(fclayer_input_size, len(self.classes)) 
         self.model.load_state_dict(torch.load(model_weights_path))
         self.model.to(device)
         self.model.eval()
@@ -53,4 +56,4 @@ class ModelUtils:
         img = self.unnormalize(image_tensor[0])
         cam_image = show_cam_on_image(img, grayscale_cam, use_rgb=True)
 
-        return predicted[0].item(), cam_image
+        return self.classes[predicted[0].item()], cam_image
