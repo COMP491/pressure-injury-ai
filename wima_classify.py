@@ -29,7 +29,7 @@ def classify():
     else:
         device = torch.device("cpu")
 
-    weights_dir = './resnet18_model_weights.pth'
+    weights_dir = './resnet18_4class_model_weights.pth'
     model_utils = ModelUtils(weights_dir, device)
     
     prediction, cam_image = model_utils.predict_and_visualize(image)
