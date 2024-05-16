@@ -6,32 +6,46 @@ Created on Tue May 14 18:27:10 2024
 @author: ahmetbakcaci
 """
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify
 import io
+from model import ModelUtils
+from PIL import Image
+import torch
 import base64
-#import your_ai_module  # Import your AI model
 
 app = Flask(__name__)
 
 @app.route('/classify', methods=['POST'])
 def classify():
-    # Receive image data from the frontend
-    image_data = request.files['image']
+    
+    image_data = request.files['image'].read()
+    
+    image = Image.open(io.BytesIO(image_data))
+    
+    if torch.cuda.is_available(): 
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
 
-    # Preprocess image_data if necessary
+    weights_dir = './resnet18_model_weights.pth'
+    model_utils = ModelUtils(weights_dir, device)
+    
+    prediction, cam_image = model_utils.predict_and_visualize(image)
+    
+    prediction = str(prediction)
+    
+    cam_pil_image = Image.fromarray(cam_image)
+    
+    cam_pil_image = cam_pil_image.rotate(-90, expand=True)
 
-    # Perform prediction using your AI model
-    #prediction, generated_image = your_ai_module.predict_with_image(image_data)
-    prediction = "3"
-    # Convert generated image data to bytes
-    """
-    generated_image = image_data
-    image_bytes = io.BytesIO()
-    generated_image.save(image_bytes, format='JPEG')
-    image_bytes.seek(0)
-    """
-    encoded_image = base64.b64encode(image_data.read()).decode('utf-8')
-    # Return the prediction and generated image as JSON response
+    buffer = io.BytesIO()
+    cam_pil_image.save(buffer, format='PNG')  # You can change the format as needed
+    buffer.seek(0)
+    
+    encoded_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    
     return jsonify({'prediction': prediction, 'gradImageData': encoded_image})
 
 if __name__ == '__main__':
