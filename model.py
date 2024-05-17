@@ -7,6 +7,7 @@ Created on Thu May 16 23:14:13 2024
 """
 
 import torch
+import torch.nn as nn
 import numpy as np
 from torchvision import models, transforms
 from pytorch_grad_cam import GradCAM
@@ -16,7 +17,7 @@ from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 class ModelUtils:
     def __init__(self, model_weights_path, device):
         self.device = device
-        self.classes = ['stage 1', 'stage 2', 'stage 3', 'stage 4']
+        self.classes = ['1', '2', '3', '4']
         self.model = models.resnet18(weights='ResNet18_Weights.IMAGENET1K_V1')
         fclayer_input_size = self.model.fc.in_features
         self.model.fc = nn.Linear(fclayer_input_size, len(self.classes)) 
