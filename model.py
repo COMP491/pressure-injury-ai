@@ -57,4 +57,4 @@ class ModelUtils:
         img = self.unnormalize(image_tensor[0])
         cam_image = show_cam_on_image(img, grayscale_cam, use_rgb=True)
 
-        return self.classes[predicted[0].item()], cam_image
+        return self.classes[predicted[0].item()], img, cam_image
