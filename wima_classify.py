@@ -50,7 +50,7 @@ def classify():
     buffer_1.seek(0)
     buffer_2.seek(0)
     
-    encoded_image = base64.b64encode(buffer_1.getvalue()).decode('utf-8')
+    encoded_cam_image = base64.b64encode(buffer_1.getvalue()).decode('utf-8')
     encoded_resized_image = base64.b64encode(buffer_2.getvalue()).decode('utf-8')
     
     return jsonify({'prediction': prediction, 'resizedImageData': encoded_resized_image, 'gradImageData': encoded_cam_image})
